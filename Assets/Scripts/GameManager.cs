@@ -10,12 +10,20 @@ public class GameManager : MonoBehaviour
     [SerializeField] private BlockSpawner blockSpawner;
     [SerializeField] private GameObject tetrominoContainer;
     [SerializeField] private GameObject holdContainer;
-    [SerializeField] private float previousTime;
-
+    
+    private float previousTime;
     private TetrisBlock currentTetromino;
     private bool canHoldTetromino;
     private TetrisBlock currentlyHeldTetromino;
     private bool clearLinesMode;
+
+    // Audio Source
+    private AudioSource audioSource;
+
+    // Audio Clips
+    [SerializeField] private AudioClip fallSFX;
+    [SerializeField] private AudioClip touchSFX;
+    [SerializeField] private AudioClip touchDownSFX;
 
     #region Singleton
     private static GameManager _instance;
@@ -39,6 +47,11 @@ public class GameManager : MonoBehaviour
     }
     #endregion
 
+    private void Awake()
+    {
+        audioSource = GetComponent<AudioSource>();
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -61,6 +74,8 @@ public class GameManager : MonoBehaviour
                 if (!tetrisGrid.TryMove(currentTransform))
                 {
                     currentTetromino.MoveRight();
+                    audioSource.clip = touchSFX;
+                    audioSource.Play();
                 }
             }
 
@@ -71,6 +86,8 @@ public class GameManager : MonoBehaviour
                 if (!tetrisGrid.TryMove(currentTransform))
                 {
                     currentTetromino.MoveLeft();
+                    audioSource.clip = touchSFX;
+                    audioSource.Play();
                 }
             }
 
@@ -104,7 +121,7 @@ public class GameManager : MonoBehaviour
                 }
             }
 
-            if (Input.GetKeyDown(KeyCode.Z) && canHoldTetromino)
+            if (Input.GetKeyDown(KeyCode.Z))
             {
                 HoldTetromino();
             }
@@ -116,9 +133,16 @@ public class GameManager : MonoBehaviour
                 if (!tetrisGrid.TryMove(currentTransform))
                 {
                     currentTetromino.MoveUp();
+                    audioSource.clip = touchDownSFX;
+                    audioSource.Play();
                     tetrisGrid.AddToGrid(currentTransform);
 
                     clearLinesMode = true;
+                }
+                else
+                {
+                    audioSource.clip = fallSFX;
+                    audioSource.Play();
                 }
 
                 previousTime = Time.time;
@@ -139,6 +163,8 @@ public class GameManager : MonoBehaviour
 
     private void HoldTetromino()
     {
+        if (!canHoldTetromino) return;
+
         if (currentlyHeldTetromino != null)
         {
             TetrisBlock tempTetromino = currentTetromino;
@@ -160,6 +186,8 @@ public class GameManager : MonoBehaviour
 
         currentlyHeldTetromino.transform.localPosition = Vector3.zero;
         currentlyHeldTetromino.transform.localRotation = Quaternion.identity;
+
+        holdContainer.GetComponent<AudioSource>().Play();
     }
 
     public void DropTetromino()
