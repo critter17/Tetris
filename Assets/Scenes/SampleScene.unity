@@ -2368,7 +2368,7 @@ GameObject:
   - component: {fileID: 1176489369}
   - component: {fileID: 1176489368}
   m_Layer: 0
-  m_Name: Tetrominoe Spawner
+  m_Name: Tetromino Spawner
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2387,13 +2387,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tetrisBlocks:
-  - {fileID: 5247892851199657005, guid: 9f6429a0572d84f4c9786837dac79b16, type: 3}
-  - {fileID: 4695287754542865352, guid: 12e6ff70249c1b34eb51781e4772d208, type: 3}
-  - {fileID: 9124269670773507061, guid: 56f13022006db79428d58cfd39f396e5, type: 3}
-  - {fileID: 8651314293756409888, guid: 4481bd4989ef66b4783ec93a81e1c70a, type: 3}
-  - {fileID: 7668148841805727184, guid: 598475ed41a01e343a2feedc0ed5867e, type: 3}
-  - {fileID: 7336801554216558499, guid: 5801bd19c005be84ea5a501eb6473f09, type: 3}
-  - {fileID: 746028269179268116, guid: b46646944ca6dcf4a9df676627dd53d7, type: 3}
+  - {fileID: 1550699572768062402, guid: 420ee8e860d33a8459e06e345e5768a2, type: 3}
+  - {fileID: 4535143106012358056, guid: 12a26c78fe74d674495fb51646e77a86, type: 3}
+  - {fileID: 7674464700799150725, guid: f39646f564970cd42807ef5b1babfa99, type: 3}
+  - {fileID: 5119591727129594392, guid: 98ae40ad28cb3f1428cffc67edd173bd, type: 3}
+  - {fileID: 2597249991846330526, guid: 4365bbebdc8c3c34db25ead055d023c8, type: 3}
+  - {fileID: 8750744996333281035, guid: 73ab8b0b1e1088846bbd614c137ddf77, type: 3}
+  - {fileID: 9093056586767487231, guid: 03ff9545e0280ba4d90ee98089b3b123, type: 3}
 --- !u!4 &1176489369
 Transform:
   m_ObjectHideFlags: 0

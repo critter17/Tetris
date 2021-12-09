@@ -71,7 +71,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: 2c4cea7bddb1a304ab88cbbef563923e, type: 3}
-  m_Color: {r: 0.8679245, g: 0.10901119, b: 0.09416164, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -107,7 +107,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2217293064448588441}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -1, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 2500647334505273943}
@@ -276,7 +276,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: 2c4cea7bddb1a304ab88cbbef563923e, type: 3}
-  m_Color: {r: 0.8679245, g: 0.10901119, b: 0.09416164, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -393,7 +393,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4902408661310754619}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1, y: -1, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4605686813355240933}
@@ -441,7 +441,7 @@ GameObject:
   - component: {fileID: 353887637054705266}
   - component: {fileID: 1640843647071733950}
   m_Layer: 0
-  m_Name: Z Tetrominoe
+  m_Name: Tetromino
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -455,7 +455,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5247892851199657005}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.15, y: 13.01, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4479822249784386017}
@@ -481,10 +481,7 @@ MonoBehaviour:
   fallTime: 1
   previousTime: 0
   moveSFX: {fileID: 8300000, guid: 2fe2dc9158602044ca399d6b0c3f0659, type: 3}
-  fallSFX: {fileID: 8300000, guid: e47d6847d834a974e9d08532d8a0ec93, type: 3}
   rotateSFX: {fileID: 8300000, guid: 215fbc7622f34ed45b4d2d227d86644b, type: 3}
-  touchSFX: {fileID: 8300000, guid: 911bba611c180844983f9217a65c1bde, type: 3}
-  touchDownSFX: {fileID: 8300000, guid: d7e9d056d8ddadf4e900dce9369676af, type: 3}
 --- !u!82 &1640843647071733950
 AudioSource:
   m_ObjectHideFlags: 0
@@ -814,7 +811,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: 2c4cea7bddb1a304ab88cbbef563923e, type: 3}
-  m_Color: {r: 0.8679245, g: 0.10901119, b: 0.09416164, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -976,7 +973,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: 2c4cea7bddb1a304ab88cbbef563923e, type: 3}
-  m_Color: {r: 0.8679245, g: 0.10901119, b: 0.09416164, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -1012,7 +1009,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9051457635216984579}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 5912516789140816119}
