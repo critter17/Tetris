@@ -5,14 +5,18 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    private static Vector3 startingPoint = new Vector3(5.0f, 18f, 0.0f);
+
     // Serialized Variables
     [SerializeField] private TetrisGrid tetrisGrid;
     [SerializeField] private BlockSpawner blockSpawner;
     [SerializeField] private GameObject tetrominoContainer;
     [SerializeField] private GameObject holdContainer;
-    
+    [SerializeField] private GameObject nextContainer;
+
     private float previousTime;
-    private TetrisBlock currentTetromino;
+    [SerializeField] private TetrisBlock currentTetromino;
+    [SerializeField] private TetrisBlock nextTetromino;
     private bool canHoldTetromino;
     private TetrisBlock currentlyHeldTetromino;
     private bool clearLinesMode;
@@ -192,7 +196,20 @@ public class GameManager : MonoBehaviour
 
     public void DropTetromino()
     {
-        currentTetromino = blockSpawner.dropBlock();
+        if (!nextTetromino)
+        {
+            nextTetromino = blockSpawner.dropBlock();
+        }
+
+        // TODO: Swap currentTetromino with block in nextTetromino, then spawn new block in next
+        currentTetromino = nextTetromino;
+        currentTetromino.transform.SetParent(tetrominoContainer.transform);
+        currentTetromino.transform.localPosition = startingPoint;
+
+        nextTetromino = blockSpawner.dropBlock();
+
+        nextTetromino.transform.SetParent(nextContainer.transform);
+        nextTetromino.transform.localPosition = Vector3.zero;
 
         canHoldTetromino = true;
     }

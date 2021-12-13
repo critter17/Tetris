@@ -9,7 +9,7 @@ public class BlockSpawner : MonoBehaviour
     public TetrisBlock dropBlock()
     {
         GameObject tetromino = Instantiate(tetrisBlocks[Random.Range(0, tetrisBlocks.Length)], transform.position, Quaternion.identity);
-        tetromino.transform.SetParent(GameObject.FindWithTag("Tetrominos").transform);
+        tetromino.transform.SetParent(GameObject.FindWithTag("Next").transform);
         return tetromino.GetComponent<TetrisBlock>();
     }
 }
