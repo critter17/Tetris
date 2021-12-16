@@ -11,7 +11,7 @@ public class TetrisBlock : MonoBehaviour
     // Design adjusters
     [SerializeField] private Vector3 rotationPoint;
     [SerializeField] private float fallTime = 1.0f;
-    [SerializeField] private float previousTime;
+    private float dirTime = 0.25f;
 
     // Audio Source
     private AudioSource audioSource;
@@ -21,10 +21,16 @@ public class TetrisBlock : MonoBehaviour
     [SerializeField] private AudioClip rotateSFX;
     
 
-    public float Speed
+    public float FallSpeed
     {
         get => fallTime;
         set => fallTime = value;
+    }
+
+    public float DirSpeed
+    {
+        get => dirTime;
+        set => dirTime = value;
     }
 
     private void Awake()

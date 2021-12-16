@@ -15,6 +15,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject nextContainer;
 
     private float previousTime;
+    private float dirPreviousTime;
     [SerializeField] private TetrisBlock currentTetromino;
     [SerializeField] private TetrisBlock nextTetromino;
     private bool canHoldTetromino;
@@ -71,38 +72,48 @@ public class GameManager : MonoBehaviour
 
         if (!clearLinesMode)
         {
-            if (Input.GetKeyDown(KeyCode.LeftArrow))
-            {
-                currentTetromino.MoveLeft();
-
-                if (!tetrisGrid.TryMove(currentTransform))
-                {
-                    currentTetromino.MoveRight();
-                    audioSource.clip = touchSFX;
-                    audioSource.Play();
-                }
-            }
-
-            if (Input.GetKeyDown(KeyCode.RightArrow))
-            {
-                currentTetromino.MoveRight();
-
-                if (!tetrisGrid.TryMove(currentTransform))
-                {
-                    currentTetromino.MoveLeft();
-                    audioSource.clip = touchSFX;
-                    audioSource.Play();
-                }
-            }
-
             if (Input.GetKeyDown(KeyCode.DownArrow))
             {
-                currentTetromino.Speed = 0.10f;
+                currentTetromino.FallSpeed = 0.10f;
             }
 
             if (Input.GetKeyUp(KeyCode.DownArrow))
             {
-                currentTetromino.Speed = 1.0f;
+                currentTetromino.FallSpeed = 1.0f;
+            }
+
+            if (Input.GetKey(KeyCode.LeftArrow))
+            {
+                if (Time.time - dirPreviousTime > currentTetromino.DirSpeed)
+                {
+                    currentTetromino.MoveLeft();
+
+                    if (!tetrisGrid.TryMove(currentTransform))
+                    {
+                        currentTetromino.MoveRight();
+                        audioSource.clip = touchSFX;
+                        audioSource.Play();
+                    }
+
+                    dirPreviousTime = Time.time;
+                }
+            }
+
+            if (Input.GetKey(KeyCode.RightArrow))
+            {
+                if (Time.time - dirPreviousTime > currentTetromino.DirSpeed)
+                {
+                    currentTetromino.MoveRight();
+
+                    if (!tetrisGrid.TryMove(currentTransform))
+                    {
+                        currentTetromino.MoveLeft();
+                        audioSource.clip = touchSFX;
+                        audioSource.Play();
+                    }
+
+                    dirPreviousTime = Time.time;
+                }
             }
 
             if (Input.GetKeyDown(KeyCode.C))
@@ -130,7 +141,7 @@ public class GameManager : MonoBehaviour
                 HoldTetromino();
             }
 
-            if (Time.time - previousTime > currentTetromino.Speed)
+            if (Time.time - previousTime > currentTetromino.FallSpeed)
             {
                 currentTetromino.MoveDown();
 
