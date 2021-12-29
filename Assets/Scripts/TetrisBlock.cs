@@ -8,18 +8,28 @@ public class TetrisBlock : MonoBehaviour
     // Static Variables
     private static float moveDist = 1.0f;
 
+    // Object References
+    [SerializeField] private GameObject dropShadowBlocks;
+    [SerializeField] private GameObject blocks;
+
     // Design adjusters
     [SerializeField] private Vector3 rotationPoint;
     [SerializeField] private float fallTime = 1.0f;
-    private float dirTime = 0.25f;
+    private float dirTime = 0.15f;
 
     // Audio Source
     private AudioSource audioSource;
 
-    // Audio Files
-    [SerializeField] private AudioClip moveSFX;
-    [SerializeField] private AudioClip rotateSFX;
-    
+    #region Properties
+    public GameObject DropShadowBlocks
+    {
+        get => dropShadowBlocks;
+    }
+
+    public GameObject Blocks
+    {
+        get => blocks;
+    }
 
     public float FallSpeed
     {
@@ -32,6 +42,7 @@ public class TetrisBlock : MonoBehaviour
         get => dirTime;
         set => dirTime = value;
     }
+    #endregion
 
     private void Awake()
     {
@@ -41,7 +52,7 @@ public class TetrisBlock : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (transform.childCount == 0)
+        if (blocks.transform.childCount == 0)
         {
             Destroy(gameObject);
         }
@@ -50,19 +61,11 @@ public class TetrisBlock : MonoBehaviour
     public void MoveLeft()
     {
         transform.position += new Vector3(-moveDist, 0, 0);
-        playAudio(moveSFX);
-    }
-
-    private void playAudio(AudioClip audioClipToPlay)
-    {
-        audioSource.clip = audioClipToPlay;
-        audioSource.Play();
     }
 
     public void MoveRight()
     {
         transform.position += new Vector3(moveDist, 0, 0);
-        playAudio(moveSFX);
     }
 
     public void MoveDown()
@@ -78,13 +81,11 @@ public class TetrisBlock : MonoBehaviour
     public void RotateLeft()
     {
         transform.RotateAround(transform.TransformPoint(rotationPoint), new Vector3(0, 0, 1), 90);
-        playAudio(rotateSFX);
     }
 
     public void RotateRight()
     {
         transform.RotateAround(transform.TransformPoint(rotationPoint), new Vector3(0, 0, 1), -90);
-        playAudio(rotateSFX);
     }
 
 

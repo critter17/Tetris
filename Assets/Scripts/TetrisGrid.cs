@@ -7,7 +7,22 @@ public class TetrisGrid : MonoBehaviour
     // Static Variables
     private static int gridHeight = 20;
     private static int gridWidth = 10;
-    private static Transform[,] grid = new Transform[gridWidth, gridHeight];
+    private Transform[,] grid = new Transform[gridWidth, gridHeight];
+
+    public int GridHeight
+    {
+        get => gridHeight;
+    }
+
+    public int GridWidth
+    {
+        get => gridWidth;
+    }
+
+    public Transform[,] Grid
+    {
+        get => grid;
+    }
 
     public bool CheckForLines()
     {
@@ -77,6 +92,8 @@ public class TetrisGrid : MonoBehaviour
 
     public void AddToGrid(Transform blockTransform)
     {
+        Debug.Log("Adding blocks to grid...");
+
         foreach (Transform block in blockTransform)
         {
             int column = Mathf.RoundToInt(block.transform.position.x);
