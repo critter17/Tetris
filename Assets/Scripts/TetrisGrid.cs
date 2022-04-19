@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,6 +9,7 @@ public class TetrisGrid : MonoBehaviour
     private static int gridHeight = 20;
     private static int gridWidth = 10;
     private Transform[,] grid = new Transform[gridWidth, gridHeight];
+    DebugGrid debugGrid;
 
     public int GridHeight
     {
@@ -24,9 +26,14 @@ public class TetrisGrid : MonoBehaviour
         get => grid;
     }
 
-    public bool CheckForLines()
+    private void Awake()
     {
-        bool lineFound = false;
+        debugGrid = FindObjectOfType<DebugGrid>();
+    }
+
+    public List<Transform> CheckForLines()
+    {
+        List<Transform> clearedBlocks = new List<Transform>();
 
         for (int i = gridHeight - 1; i >= 0; i--)
         {
@@ -34,25 +41,12 @@ public class TetrisGrid : MonoBehaviour
             {
                 for (int column = 0; column < gridWidth; column++)
                 {
-                    Animation animation = grid[column, i].gameObject.GetComponent<Animation>();
-                    animation.Play();
-
-                    RemoveBlock(column, i);
-                    MoveLines(column, i + 1);
+                    clearedBlocks.Add(grid[column, i]);
                 }
-
-                lineFound = true;
             }
         }
 
-        if (lineFound)
-        {
-            return false;
-        }
-        else
-        {
-            return true;
-        }
+        return clearedBlocks;
     }
 
     public bool HasLine(int i)
@@ -70,8 +64,8 @@ public class TetrisGrid : MonoBehaviour
 
     public void RemoveBlock(int column, int row)
     {
-        Destroy(grid[column, row].gameObject);
         grid[column, row] = null;
+        debugGrid.SetBlockCellText(column, row, "X");
     }
 
     public void MoveLines(int column, int row)
@@ -90,6 +84,37 @@ public class TetrisGrid : MonoBehaviour
         }
     }
 
+    public List<Transform> GetBlocksAboveRow(int row)
+    {
+        List<Transform> hoveringBlocks = new List<Transform>();
+
+        for (int i = 0; i < gridWidth; i++)
+        {
+            for (int startingRow = row + 1; startingRow < gridHeight; startingRow++)
+            {
+                if (grid[i, startingRow])
+                {
+                    hoveringBlocks.Add(grid[i, startingRow]);
+                }
+            }
+        }
+
+        return hoveringBlocks;
+    }
+
+    public void MoveBlockDown(int column, int row)
+    {
+        Debug.LogFormat("Moving block from ({0}, {1}) to ({2}, {3})", column, row, column, row - 1);
+        if (!IsBlockGrounded(column, row))
+        {
+            grid[column, row - 1] = grid[column, row];
+            grid[column, row - 1].position -= new Vector3(0, 1, 0);
+            grid[column, row] = null;
+            debugGrid.SetBlockCellText(column, row - 1, "O");
+            debugGrid.SetBlockCellText(column, row, "X");
+        }
+    }
+
     public void AddToGrid(Transform blockTransform)
     {
         Debug.Log("Adding blocks to grid...");
@@ -100,6 +125,7 @@ public class TetrisGrid : MonoBehaviour
             int row = Mathf.RoundToInt(block.transform.position.y);
 
             grid[column, row] = block;
+            debugGrid.SetBlockCellText(column, row, "O");
         }
     }
 
@@ -122,5 +148,35 @@ public class TetrisGrid : MonoBehaviour
         }
 
         return true;
+    }
+
+    public bool IsBlockGrounded(int column, int row)
+    {
+        Debug.Log("Checking if block at (" + column + ", " + row + ") is valid");
+
+        return row <= 0 || grid[column, row - 1] != null;
+    }
+
+    public int GetLowestRowCleared(List<Transform> blocksToClear)
+    {
+        int minRow = 19;
+
+        for (int i = 0; i < blocksToClear.Count; i++)
+        {
+            int posX = Mathf.RoundToInt(blocksToClear[i].position.x);
+            int posY = Mathf.RoundToInt(blocksToClear[i].position.y);
+
+            Debug.Log("GetLowestRowCleared: (" + posX + ", " + posY + ")");
+
+            if (blocksToClear[i])
+            {
+                if (posY < minRow)
+                {
+                    minRow = (int)blocksToClear[i].position.y;
+                }
+            }
+        }
+
+        return minRow;
     }
 }
