@@ -16,10 +16,7 @@ public class TetrisGrid : MonoBehaviour
         get => gridHeight;
     }
 
-    public int GridWidth
-    {
-        get => gridWidth;
-    }
+    public int GridWidth => gridWidth;
 
     public Transform[,] Grid
     {

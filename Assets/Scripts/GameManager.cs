@@ -327,6 +327,29 @@ public class GameManager : MonoBehaviour
             currentlyHeldTetromino = tempTetromino;
 
             currentTetromino.transform.position = tempTetromino.transform.position;
+
+            Debug.Log("Current Tetromino: " +  currentTetromino.transform.position);
+
+            for (int j = 0; j < currentTetromino.Blocks.transform.childCount; j++)
+            {
+                Transform currentBlock = currentTetromino.Blocks.transform.GetChild(j);
+                int column = Mathf.RoundToInt(currentBlock.transform.position.x);
+                int row = Mathf.RoundToInt(currentBlock.transform.position.y);
+
+                Debug.Log("Column: " + column);
+                Debug.Log("Row: " + row);
+
+                if (column < 0 && tetrisGrid.Grid[column, row] == null)
+                {
+                    currentTetromino.transform.position = new Vector3(currentTetromino.transform.position.x - 1, currentTetromino.transform.position.y);
+                }
+
+                if (column > 9 && tetrisGrid.Grid[column, row] == null)
+                {
+                    currentTetromino.transform.position = new Vector3(currentTetromino.transform.position.x + 1, currentTetromino.transform.position.y);
+                }
+            }
+
             currentTetromino.DropShadowBlocks.SetActive(true);
             UpdateBlockShadows(currentTetromino.Blocks.transform);
 
@@ -388,6 +411,9 @@ public class GameManager : MonoBehaviour
                 Transform shadowBlock = shadowBlocks.GetChild(j);
                 int column = Mathf.RoundToInt(shadowBlock.position.x);
                 int row = Mathf.RoundToInt(shadowBlock.position.y);
+
+                Debug.Log("UpdateBlockShadows Column: " + column);
+                Debug.Log("UpdateBlockShadows Row: " + row);
 
                 if (row >= 0 && tetrisGrid.Grid[column, row] != null)
                 {
