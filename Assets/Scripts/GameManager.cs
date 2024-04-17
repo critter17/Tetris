@@ -339,14 +339,18 @@ public class GameManager : MonoBehaviour
                 Debug.Log("Column: " + column);
                 Debug.Log("Row: " + row);
 
-                if (column < 0 && tetrisGrid.Grid[column, row] == null)
-                {
-                    currentTetromino.transform.position = new Vector3(currentTetromino.transform.position.x - 1, currentTetromino.transform.position.y);
-                }
-
-                if (column > 9 && tetrisGrid.Grid[column, row] == null)
+                while (column < 0)
                 {
                     currentTetromino.transform.position = new Vector3(currentTetromino.transform.position.x + 1, currentTetromino.transform.position.y);
+                    currentBlock = currentTetromino.Blocks.transform.GetChild(j);
+                    column = Mathf.RoundToInt(currentBlock.transform.position.x);
+                }
+
+                while (column > 9)
+                {
+                    currentTetromino.transform.position = new Vector3(currentTetromino.transform.position.x - 1, currentTetromino.transform.position.y);
+                    currentBlock = currentTetromino.Blocks.transform.GetChild(j);
+                    column = Mathf.RoundToInt(currentBlock.transform.position.x);
                 }
             }
 
