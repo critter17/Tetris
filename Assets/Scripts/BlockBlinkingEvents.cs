@@ -13,7 +13,7 @@ public class BlockBlinkingEvents : MonoBehaviour
 
     public void PrintEvent(string s)
     {
-        Debug.Log("PrintEvent: " + s + "called at: " + Time.time);
+        //Debug.Log("PrintEvent: " + s + "called at: " + Time.time);
     }
 
     public void DeleteBlock()
@@ -21,9 +21,9 @@ public class BlockBlinkingEvents : MonoBehaviour
         int x = Mathf.RoundToInt(transform.position.x);
         int y = Mathf.RoundToInt(transform.position.y);
 
-        Debug.Log("Deleting block at (" + x + ", " + y + ")");
+        //Debug.Log("Deleting block at (" + x + ", " + y + ")");
         tetrisGrid.RemoveBlock(x, y);
         Destroy(gameObject);
-        Debug.Log("Block destroyed");
+        //Debug.Log("Block destroyed");
     }
 }

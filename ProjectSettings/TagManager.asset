@@ -7,6 +7,7 @@ TagManager:
   - Tetrominos
   - Next
   - Shadow
+  - Debug
   layers:
   - Default
   - TransparentFX
@@ -41,6 +42,9 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: BG
+    uniqueID: 3772401733
+    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0

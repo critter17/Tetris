@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public enum TetrisState
@@ -32,6 +30,7 @@ public class GameManager : MonoBehaviour
     List<Transform> blocksAboveClearedBlocks;
     private bool clearedLines;
     private int lowestRow;
+    private bool isGameOver = false;
 
     // Audio Source
     private AudioSource audioSource;
@@ -70,6 +69,12 @@ public class GameManager : MonoBehaviour
     private void Awake()
     {
         audioSource = GetComponent<AudioSource>();
+
+        if (Debug.isDebugBuild)
+        {
+            DebugGrid debugUI = FindObjectOfType<DebugGrid>(true);
+            debugUI.gameObject.SetActive(true);
+        }
     }
 
     // Start is called before the first frame update
@@ -192,6 +197,7 @@ public class GameManager : MonoBehaviour
                 audioSource.clip = hardDropSFX;
                 audioSource.Play();
                 CheckForLinesFormed();
+                previousTime = Time.time;
             }
 
             if (Time.time - previousTime > currentTetromino.FallSpeed)
@@ -224,7 +230,7 @@ public class GameManager : MonoBehaviour
             if (!clearedLines)
             {
                 clearedLines = true;
-                Debug.Log("Clearing lines...");
+                //Debug.Log("Clearing lines...");
                 float animationLength = 0.0f;
 
                 foreach (Transform t in blocksToClear)
@@ -240,8 +246,8 @@ public class GameManager : MonoBehaviour
         {
             if (Time.time - previousTime > 0.75f)
             {
-                Debug.Log("Dropping Block State...");
-                Debug.Log("BEFORE: blocksAboveClearedBlocks count: " + blocksAboveClearedBlocks.Count);
+                //Debug.Log("Dropping Block State...");
+                //Debug.Log("BEFORE: blocksAboveClearedBlocks count: " + blocksAboveClearedBlocks.Count);
 
                 List<Transform> blocksNotGrounded = new List<Transform>();
 
@@ -253,7 +259,7 @@ public class GameManager : MonoBehaviour
                             !tetrisGrid.IsBlockGrounded(column, row) &&
                             blocksAboveClearedBlocks.Contains(tetrisGrid.Grid[column, row]))
                         {
-                            Debug.Log("Moving Block Down: " + tetrisGrid.Grid[column, row].position);
+                            //Debug.Log("Moving Block Down: " + tetrisGrid.Grid[column, row].position);
                             blocksNotGrounded.Add(tetrisGrid.Grid[column, row]);
                             tetrisGrid.MoveBlockDown(column, row);
                         }
@@ -273,26 +279,26 @@ public class GameManager : MonoBehaviour
 
     public void AfterBlockAnimationsFinish()
     {
-        Debug.Log("AfterBlockAnimationsFinish");
+        //Debug.Log("AfterBlockAnimationsFinish");
         SetBlocksAboveClearedBlocks();
         SetTetrisState(TetrisState.DropBlocks);
     }
 
     public void SetTetrisState(TetrisState newState)
     {
-        Debug.Log("Setting TetrisState to a new state");
+        //Debug.Log("Setting TetrisState to a new state");
         tetrisState = newState;
     }
 
     private void CheckForLinesFormed()
     {
-        Debug.Log("Checking for lines formed...");
+        //Debug.Log("Checking for lines formed...");
 
         blocksToClear = tetrisGrid.CheckForLines();
 
         if (blocksToClear.Count == 0)
         {
-            Debug.Log("All possible lines cleared");
+            //Debug.Log("All possible lines cleared");
             DropTetromino();
             tetrisState = TetrisState.Play;
             blocksToClear.Clear();
@@ -312,7 +318,12 @@ public class GameManager : MonoBehaviour
 
     private void LockTetromino(Transform currentTransform)
     {
-        tetrisGrid.AddToGrid(currentTransform);
+        if (!tetrisGrid.AddToGrid(currentTransform))
+        {
+            Debug.Log("Game is over");
+            currentTetromino.FallSpeed = 0.0f;
+            isGameOver = true;
+        }
         currentTetromino.DropShadowBlocks.SetActive(false);
     }
 
@@ -328,7 +339,7 @@ public class GameManager : MonoBehaviour
 
             currentTetromino.transform.position = tempTetromino.transform.position;
 
-            Debug.Log("Current Tetromino: " +  currentTetromino.transform.position);
+            Debug.Log("Current Tetromino: " + currentTetromino.transform.position);
 
             for (int j = 0; j < currentTetromino.Blocks.transform.childCount; j++)
             {
@@ -336,8 +347,8 @@ public class GameManager : MonoBehaviour
                 int column = Mathf.RoundToInt(currentBlock.transform.position.x);
                 int row = Mathf.RoundToInt(currentBlock.transform.position.y);
 
-                Debug.Log("Column: " + column);
-                Debug.Log("Row: " + row);
+                //Debug.Log("Column: " + column);
+                //Debug.Log("Row: " + row);
 
                 while (column < 0)
                 {
@@ -378,6 +389,11 @@ public class GameManager : MonoBehaviour
 
     public void DropTetromino()
     {
+        if (isGameOver)
+        {
+            return;
+        }
+
         if (!nextTetromino)
         {
             nextTetromino = blockSpawner.dropBlock();
@@ -386,9 +402,18 @@ public class GameManager : MonoBehaviour
         currentTetromino = nextTetromino;
         currentTetromino.transform.SetParent(tetrominoContainer.transform);
         currentTetromino.transform.localPosition = startingPoint;
+        if (currentTetromino.name[0] == 'I' || currentTetromino.name[0] == 'O' ||
+            currentTetromino.name[0] == 'S' || currentTetromino.name[0] == 'Z')
+        {
+            currentTetromino.transform.localPosition += Vector3Int.up;
+        }
         currentTetromino.DropShadowBlocks.SetActive(true);
 
-        Transform currentTransform = currentTetromino.Blocks.transform;
+        while (!tetrisGrid.TryMove(currentTetromino.Blocks.transform))
+        {
+            Debug.Log("Moving piece up...");
+            currentTetromino.MoveUp();
+        }
 
         nextTetromino = blockSpawner.dropBlock();
 
@@ -399,7 +424,7 @@ public class GameManager : MonoBehaviour
 
         canHoldTetromino = true;
 
-        UpdateBlockShadows(currentTransform);
+        UpdateBlockShadows(currentTetromino.Blocks.transform);
     }
 
     private void UpdateBlockShadows(Transform currentTransform)
@@ -408,16 +433,16 @@ public class GameManager : MonoBehaviour
         Transform shadowBlocks = currentTetromino.DropShadowBlocks.transform;
         shadowBlocks.position = new Vector3(currentTransform.position.x, currentTransform.position.y);
 
+        Debug.Log("Shadow Blocks Pos: " + shadowBlocks.position);
+
         while (!hitBottom)
         {
+            Debug.Log("UPDATING SHADOW BLOCKS FOREVER??");
             for (int j = 0; j < shadowBlocks.childCount; j++)
             {
                 Transform shadowBlock = shadowBlocks.GetChild(j);
                 int column = Mathf.RoundToInt(shadowBlock.position.x);
                 int row = Mathf.RoundToInt(shadowBlock.position.y);
-
-                Debug.Log("UpdateBlockShadows Column: " + column);
-                Debug.Log("UpdateBlockShadows Row: " + row);
 
                 if (row >= 0 && tetrisGrid.Grid[column, row] != null)
                 {

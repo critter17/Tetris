@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class TetrisGrid : MonoBehaviour
 {
     // Static Variables
+    private static int gridLeeway = 5;
     private static int gridHeight = 20;
     private static int gridWidth = 10;
-    private Transform[,] grid = new Transform[gridWidth, gridHeight];
+    private Transform[,] grid = new Transform[gridWidth, gridHeight + gridLeeway];
     DebugGrid debugGrid;
 
     public int GridHeight
@@ -26,6 +25,16 @@ public class TetrisGrid : MonoBehaviour
     private void Awake()
     {
         debugGrid = FindObjectOfType<DebugGrid>();
+    }
+
+    private void SetDebugGridCell(int column, int row, string blockString)
+    {
+        if (!Debug.isDebugBuild)
+        {
+            return;
+        }
+
+        debugGrid.SetBlockCellText(column, row, blockString);
     }
 
     public List<Transform> CheckForLines()
@@ -62,7 +71,7 @@ public class TetrisGrid : MonoBehaviour
     public void RemoveBlock(int column, int row)
     {
         grid[column, row] = null;
-        debugGrid.SetBlockCellText(column, row, "X");
+        SetDebugGridCell(column, row, "X");
     }
 
     public void MoveLines(int column, int row)
@@ -101,18 +110,18 @@ public class TetrisGrid : MonoBehaviour
 
     public void MoveBlockDown(int column, int row)
     {
-        Debug.LogFormat("Moving block from ({0}, {1}) to ({2}, {3})", column, row, column, row - 1);
+        //Debug.LogFormat("Moving block from ({0}, {1}) to ({2}, {3})", column, row, column, row - 1);
         if (!IsBlockGrounded(column, row))
         {
             grid[column, row - 1] = grid[column, row];
             grid[column, row - 1].position -= new Vector3(0, 1, 0);
             grid[column, row] = null;
-            debugGrid.SetBlockCellText(column, row - 1, "O");
-            debugGrid.SetBlockCellText(column, row, "X");
+            SetDebugGridCell(column, row - 1, "O");
+            SetDebugGridCell(column, row, "X");
         }
     }
 
-    public void AddToGrid(Transform blockTransform)
+    public bool AddToGrid(Transform blockTransform)
     {
         Debug.Log("Adding blocks to grid...");
 
@@ -121,19 +130,32 @@ public class TetrisGrid : MonoBehaviour
             int column = Mathf.RoundToInt(block.transform.position.x);
             int row = Mathf.RoundToInt(block.transform.position.y);
 
+            Debug.Log("Column: " + column);
+            Debug.Log("Row: " + row);
+
+            if (row >= gridHeight)
+            {
+                return false;
+            }
+
             grid[column, row] = block;
-            debugGrid.SetBlockCellText(column, row, "O");
+            SetDebugGridCell(column, row, "O");
         }
+
+        return true;
     }
 
     public bool TryMove(Transform tetromino)
     {
+        Debug.Log("Try move start...");
         foreach (Transform block in tetromino)
         {
             int column = Mathf.RoundToInt(block.transform.position.x);
             int row = Mathf.RoundToInt(block.transform.position.y);
 
-            if (column < 0 || column >= gridWidth || row < 0 || row >= gridHeight)
+            Debug.LogFormat("Piece at ({0}, {1})", column, row);
+
+            if (column < 0 || column >= gridWidth || row < 0 || row >= (gridHeight + gridLeeway))
             {
                 return false;
             }
@@ -144,12 +166,14 @@ public class TetrisGrid : MonoBehaviour
             }
         }
 
+        Debug.Log("Try move end...");
+
         return true;
     }
 
     public bool IsBlockGrounded(int column, int row)
     {
-        Debug.Log("Checking if block at (" + column + ", " + row + ") is valid");
+        //Debug.Log("Checking if block at (" + column + ", " + row + ") is valid");
 
         return row <= 0 || grid[column, row - 1] != null;
     }
@@ -163,7 +187,7 @@ public class TetrisGrid : MonoBehaviour
             int posX = Mathf.RoundToInt(blocksToClear[i].position.x);
             int posY = Mathf.RoundToInt(blocksToClear[i].position.y);
 
-            Debug.Log("GetLowestRowCleared: (" + posX + ", " + posY + ")");
+            //Debug.Log("GetLowestRowCleared: (" + posX + ", " + posY + ")");
 
             if (blocksToClear[i])
             {
