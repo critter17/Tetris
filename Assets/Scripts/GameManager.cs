@@ -1,11 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using CritterGames.UI;
+using System.Collections.Generic;
 using UnityEngine;
 
-public enum TetrisState
+public enum GameState
 {
     Play,
     ClearLines,
-    DropBlocks
+    DropBlocks,
+    Paused
 }
 
 public class GameManager : MonoBehaviour
@@ -25,12 +27,16 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TetrisBlock nextTetromino;
     private bool canHoldTetromino;
     private TetrisBlock currentlyHeldTetromino;
-    private TetrisState tetrisState;
+    private GameState gameState;
+    private GameState previousGameState;
     private List<Transform> blocksToClear;
     List<Transform> blocksAboveClearedBlocks;
     private bool clearedLines;
     private int lowestRow;
     private bool isGameOver = false;
+
+    // UI
+    [SerializeField] private UISystem menu;
 
     // Audio Source
     private AudioSource audioSource;
@@ -84,14 +90,18 @@ public class GameManager : MonoBehaviour
         blocksToClear = new List<Transform>();
         blocksAboveClearedBlocks = new List<Transform>();
         clearedLines = false;
-        tetrisState = TetrisState.Play;
+        gameState = GameState.Play;
         DropTetromino();
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if (tetrisState == TetrisState.Play)
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            TogglePause();
+        }
+
+        if (gameState == GameState.Play)
         {
             Transform currentTransform = currentTetromino.Blocks.transform;
 
@@ -225,12 +235,11 @@ public class GameManager : MonoBehaviour
                 previousTime = Time.time;
             }
         }
-        else if (tetrisState == TetrisState.ClearLines)
+        else if (gameState == GameState.ClearLines)
         {
             if (!clearedLines)
             {
                 clearedLines = true;
-                //Debug.Log("Clearing lines...");
                 float animationLength = 0.0f;
 
                 foreach (Transform t in blocksToClear)
@@ -242,13 +251,10 @@ public class GameManager : MonoBehaviour
                 Invoke("AfterBlockAnimationsFinish", animationLength + 1.0f);
             }
         }
-        else if (tetrisState == TetrisState.DropBlocks)
+        else if (gameState == GameState.DropBlocks)
         {
             if (Time.time - previousTime > 0.75f)
             {
-                //Debug.Log("Dropping Block State...");
-                //Debug.Log("BEFORE: blocksAboveClearedBlocks count: " + blocksAboveClearedBlocks.Count);
-
                 List<Transform> blocksNotGrounded = new List<Transform>();
 
                 for (int row = 0; row < tetrisGrid.GridHeight; row++)
@@ -259,7 +265,6 @@ public class GameManager : MonoBehaviour
                             !tetrisGrid.IsBlockGrounded(column, row) &&
                             blocksAboveClearedBlocks.Contains(tetrisGrid.Grid[column, row]))
                         {
-                            //Debug.Log("Moving Block Down: " + tetrisGrid.Grid[column, row].position);
                             blocksNotGrounded.Add(tetrisGrid.Grid[column, row]);
                             tetrisGrid.MoveBlockDown(column, row);
                         }
@@ -277,37 +282,47 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void AfterBlockAnimationsFinish()
+    private void TogglePause()
     {
-        //Debug.Log("AfterBlockAnimationsFinish");
-        SetBlocksAboveClearedBlocks();
-        SetTetrisState(TetrisState.DropBlocks);
+        if (gameState != GameState.Paused)
+        {
+            previousGameState = gameState;
+            SetGameState(GameState.Paused);
+        }
+        else
+        {
+            SetGameState(previousGameState);
+        }
+
+        menu.gameObject.SetActive(!menu.gameObject.activeSelf);
     }
 
-    public void SetTetrisState(TetrisState newState)
+    public void AfterBlockAnimationsFinish()
     {
-        //Debug.Log("Setting TetrisState to a new state");
-        tetrisState = newState;
+        SetBlocksAboveClearedBlocks();
+        SetGameState(GameState.DropBlocks);
+    }
+
+    public void SetGameState(GameState newState)
+    {
+        gameState = newState;
     }
 
     private void CheckForLinesFormed()
     {
-        //Debug.Log("Checking for lines formed...");
-
         blocksToClear = tetrisGrid.CheckForLines();
 
         if (blocksToClear.Count == 0)
         {
-            //Debug.Log("All possible lines cleared");
             DropTetromino();
-            tetrisState = TetrisState.Play;
+            gameState = GameState.Play;
             blocksToClear.Clear();
             blocksAboveClearedBlocks.Clear();
         }
         else
         {
             lowestRow = tetrisGrid.GetLowestRowCleared(blocksToClear);
-            tetrisState = TetrisState.ClearLines;
+            SetGameState(GameState.ClearLines);
         }
     }
 
@@ -333,40 +348,8 @@ public class GameManager : MonoBehaviour
 
         if (currentlyHeldTetromino != null)
         {
-            TetrisBlock tempTetromino = currentTetromino;
-            currentTetromino = currentlyHeldTetromino;
-            currentlyHeldTetromino = tempTetromino;
-
-            currentTetromino.transform.position = tempTetromino.transform.position;
-
-            Debug.Log("Current Tetromino: " + currentTetromino.transform.position);
-
-            for (int j = 0; j < currentTetromino.Blocks.transform.childCount; j++)
-            {
-                Transform currentBlock = currentTetromino.Blocks.transform.GetChild(j);
-                int column = Mathf.RoundToInt(currentBlock.transform.position.x);
-                int row = Mathf.RoundToInt(currentBlock.transform.position.y);
-
-                //Debug.Log("Column: " + column);
-                //Debug.Log("Row: " + row);
-
-                while (column < 0)
-                {
-                    currentTetromino.transform.position = new Vector3(currentTetromino.transform.position.x + 1, currentTetromino.transform.position.y);
-                    currentBlock = currentTetromino.Blocks.transform.GetChild(j);
-                    column = Mathf.RoundToInt(currentBlock.transform.position.x);
-                }
-
-                while (column > 9)
-                {
-                    currentTetromino.transform.position = new Vector3(currentTetromino.transform.position.x - 1, currentTetromino.transform.position.y);
-                    currentBlock = currentTetromino.Blocks.transform.GetChild(j);
-                    column = Mathf.RoundToInt(currentBlock.transform.position.x);
-                }
-            }
-
-            currentTetromino.DropShadowBlocks.SetActive(true);
-            UpdateBlockShadows(currentTetromino.Blocks.transform);
+            (currentlyHeldTetromino, currentTetromino) = (currentTetromino, currentlyHeldTetromino);
+            SetCurrentPieceAtStartingPoint();
 
             canHoldTetromino = false;
         }
@@ -381,6 +364,7 @@ public class GameManager : MonoBehaviour
         currentlyHeldTetromino.transform.SetParent(holdContainer.transform);
         currentlyHeldTetromino.transform.localPosition = Vector3.zero;
         currentlyHeldTetromino.transform.localRotation = Quaternion.identity;
+        currentlyHeldTetromino.transform.position = currentlyHeldTetromino.transform.GetChild(currentlyHeldTetromino.transform.childCount - 1).position;
 
         currentlyHeldTetromino.DropShadowBlocks.SetActive(false);
 
@@ -401,28 +385,32 @@ public class GameManager : MonoBehaviour
 
         currentTetromino = nextTetromino;
         currentTetromino.transform.SetParent(tetrominoContainer.transform);
-        currentTetromino.transform.localPosition = startingPoint;
+        SetCurrentPieceAtStartingPoint();
+        
+        nextTetromino = blockSpawner.dropBlock();
+        nextTetromino.transform.SetParent(nextContainer.transform);
+        nextTetromino.transform.localPosition = Vector3.zero;
+        nextTetromino.transform.position = nextTetromino.transform.GetChild(nextTetromino.transform.childCount - 1).position;
+        nextTetromino.DropShadowBlocks.SetActive(false);
+
+        canHoldTetromino = true;
+    }
+
+    private void SetCurrentPieceAtStartingPoint()
+    {
+        currentTetromino.transform.position = startingPoint;
+
         if (currentTetromino.name[0] == 'I' || currentTetromino.name[0] == 'O' ||
             currentTetromino.name[0] == 'S' || currentTetromino.name[0] == 'Z')
         {
-            currentTetromino.transform.localPosition += Vector3Int.up;
+            currentTetromino.transform.position += Vector3Int.up;
         }
         currentTetromino.DropShadowBlocks.SetActive(true);
 
         while (!tetrisGrid.TryMove(currentTetromino.Blocks.transform))
         {
-            Debug.Log("Moving piece up...");
             currentTetromino.MoveUp();
         }
-
-        nextTetromino = blockSpawner.dropBlock();
-
-        nextTetromino.transform.SetParent(nextContainer.transform);
-        nextTetromino.transform.localPosition = Vector3.zero;
-
-        nextTetromino.DropShadowBlocks.SetActive(false);
-
-        canHoldTetromino = true;
 
         UpdateBlockShadows(currentTetromino.Blocks.transform);
     }
@@ -433,11 +421,8 @@ public class GameManager : MonoBehaviour
         Transform shadowBlocks = currentTetromino.DropShadowBlocks.transform;
         shadowBlocks.position = new Vector3(currentTransform.position.x, currentTransform.position.y);
 
-        Debug.Log("Shadow Blocks Pos: " + shadowBlocks.position);
-
         while (!hitBottom)
         {
-            Debug.Log("UPDATING SHADOW BLOCKS FOREVER??");
             for (int j = 0; j < shadowBlocks.childCount; j++)
             {
                 Transform shadowBlock = shadowBlocks.GetChild(j);

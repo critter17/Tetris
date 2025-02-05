@@ -123,15 +123,10 @@ public class TetrisGrid : MonoBehaviour
 
     public bool AddToGrid(Transform blockTransform)
     {
-        Debug.Log("Adding blocks to grid...");
-
         foreach (Transform block in blockTransform)
         {
             int column = Mathf.RoundToInt(block.transform.position.x);
             int row = Mathf.RoundToInt(block.transform.position.y);
-
-            Debug.Log("Column: " + column);
-            Debug.Log("Row: " + row);
 
             if (row >= gridHeight)
             {
@@ -147,13 +142,10 @@ public class TetrisGrid : MonoBehaviour
 
     public bool TryMove(Transform tetromino)
     {
-        Debug.Log("Try move start...");
         foreach (Transform block in tetromino)
         {
             int column = Mathf.RoundToInt(block.transform.position.x);
             int row = Mathf.RoundToInt(block.transform.position.y);
-
-            Debug.LogFormat("Piece at ({0}, {1})", column, row);
 
             if (column < 0 || column >= gridWidth || row < 0 || row >= (gridHeight + gridLeeway))
             {
@@ -165,8 +157,6 @@ public class TetrisGrid : MonoBehaviour
                 return false;
             }
         }
-
-        Debug.Log("Try move end...");
 
         return true;
     }

@@ -5,7 +5,6 @@ using UnityEngine;
 public class BlockSpawner : MonoBehaviour
 {
     [SerializeField] private GameObject[] tetrisBlocks;
-    [SerializeField] List<TetrisBlock> nextBlocksPreviews;
 
     public TetrisBlock dropBlock()
     {

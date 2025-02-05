@@ -49,7 +49,6 @@ public class TetrisBlock : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (blocks.transform.childCount == 0)
