@@ -1,5 +1,7 @@
 ﻿using CritterGames.UI;
+using System;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public enum GameState
@@ -23,6 +25,7 @@ public class GameManager : MonoBehaviour
 
     private float previousTime;
     private float dirPreviousTime;
+    private float fallSpeed = 1.0f;
     [SerializeField] private TetrisBlock currentTetromino;
     [SerializeField] private TetrisBlock nextTetromino;
     private bool canHoldTetromino;
@@ -32,11 +35,13 @@ public class GameManager : MonoBehaviour
     private List<Transform> blocksToClear;
     List<Transform> blocksAboveClearedBlocks;
     private bool clearedLines;
+    private int linesCleared = 0;
     private int lowestRow;
     private bool isGameOver = false;
 
     // UI
     [SerializeField] private UISystem menu;
+    [SerializeField] private TextMeshProUGUI linesText;
 
     // Audio Source
     private AudioSource audioSource;
@@ -74,12 +79,23 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
+        EventManager.LineCleared += UpdateLinesCleared;
         audioSource = GetComponent<AudioSource>();
 
         if (Debug.isDebugBuild)
         {
             DebugGrid debugUI = FindObjectOfType<DebugGrid>(true);
             debugUI.gameObject.SetActive(true);
+        }
+    }
+
+    private void UpdateLinesCleared()
+    {
+        linesCleared += 1;
+
+        if (linesCleared % 10 == 0 && fallSpeed > 0.10f)
+        {
+            fallSpeed -= 0.10f;
         }
     }
 
@@ -107,12 +123,12 @@ public class GameManager : MonoBehaviour
 
             if (Input.GetKeyDown(KeyCode.DownArrow))
             {
-                currentTetromino.FallSpeed = 0.10f;
+                fallSpeed -= 0.90f;
             }
 
             if (Input.GetKeyUp(KeyCode.DownArrow))
             {
-                currentTetromino.FallSpeed = 1.0f;
+                fallSpeed += 0.90f;
             }
 
             if (Input.GetKey(KeyCode.LeftArrow))
@@ -210,7 +226,7 @@ public class GameManager : MonoBehaviour
                 previousTime = Time.time;
             }
 
-            if (Time.time - previousTime > currentTetromino.FallSpeed)
+            if (Time.time - previousTime > fallSpeed)
             {
                 currentTetromino.MoveDown();
 
@@ -253,7 +269,7 @@ public class GameManager : MonoBehaviour
         }
         else if (gameState == GameState.DropBlocks)
         {
-            if (Time.time - previousTime > 0.75f)
+            if (Time.time - previousTime > fallSpeed)
             {
                 List<Transform> blocksNotGrounded = new List<Transform>();
 
@@ -336,7 +352,7 @@ public class GameManager : MonoBehaviour
         if (!tetrisGrid.AddToGrid(currentTransform))
         {
             Debug.Log("Game is over");
-            currentTetromino.FallSpeed = 0.0f;
+            fallSpeed = 0.0f;
             isGameOver = true;
         }
         currentTetromino.DropShadowBlocks.SetActive(false);

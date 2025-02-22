@@ -49,6 +49,7 @@ public class TetrisGrid : MonoBehaviour
                 {
                     clearedBlocks.Add(grid[column, i]);
                 }
+                EventManager.LineCleared.Invoke();
             }
         }
 

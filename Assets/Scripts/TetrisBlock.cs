@@ -31,12 +31,6 @@ public class TetrisBlock : MonoBehaviour
         get => blocks;
     }
 
-    public float FallSpeed
-    {
-        get => fallTime;
-        set => fallTime = value;
-    }
-
     public float DirSpeed
     {
         get => dirTime;
